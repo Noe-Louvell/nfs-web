@@ -4,7 +4,7 @@ on:
     branches: [ master, dev ]
 
 jobs:
-  test-connection-ssh:
+  build-nfs-web:
     runs-on: ubuntu-latest
     steps:
       - name: Clone repository
@@ -15,14 +15,19 @@ jobs:
           node-version: 16.x
       - name: Install dependencies
         run: npm install
-      - name: Installation ssh
-        uses: shimataro/ssh-key-action@v2
+      - name: Build Artefact 
+        run: npm run build
+  test-nfs-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v1
         with:
-          key: ${{ secrets.SSH_KEY }}
-          known_hosts: 'random-string'
-      - name: ajout Known Hosts
-        run: ssh-keyscan -H ${{ secrets.KNOWN_HOSTS }} >> ~/.ssh/known_hosts
-      - name: création dossier build
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.KNOWN_HOSTS }} mkdir -p ./web/build
-      - name: renom dossier build
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.KNOWN_HOSTS }} 'mv ~/web/build ~/web/build-$(date +%Y%m%d_%H%M%S)'
+          node-version: 16.x
+      - name: Install dependencies
+        run: npm install
+      - name: Run test 
+        run: npm run test
+  
