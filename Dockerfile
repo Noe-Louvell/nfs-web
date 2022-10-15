@@ -1,16 +1,19 @@
-FROM node:14-alpine
+# pull official base image
+FROM node:16.18.0-alpine
 
+# set working directory
 WORKDIR /app
 
-COPY package.json .
-COPY package-lock.json .
+# add `/app/node_modules/.bin` to $PATH
+ENV PATH /app/node_modules/.bin:$PATH
 
-RUN npm install
+# install app dependencies
+COPY package.json ./
+COPY package-lock.json ./
+RUN npm install --silent
 
-COPY . .
+# add app
+COPY . ./
 
-RUN npm run build --production
-
-RUN npm install -g serve
-
-CMD [ "serve", "-s", "build" ]
+# start app
+CMD ["npm", "start"]
