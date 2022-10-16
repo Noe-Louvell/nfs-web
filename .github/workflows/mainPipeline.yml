@@ -1,0 +1,48 @@
+name: CI-CD nfs-web
+on:
+  push:
+    branches: [ master, dev ]
+
+jobs:
+  test-nfs-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - name: Install dependencies
+        run: npm install
+      - name: Run test 
+        run: npm run test
+  deploy-nfs-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - name: Install dependencies
+        run: npm install
+      - name: Build Artefact 
+        run: npm run build
+      - name: Run test 
+        run: npm run test
+      - name: Installation ssh
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: 'random-string-text'
+      - name: Add Known Hosts
+        run: ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+      - name: Create Directory build-nfs-web
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} mkdir -p ./web/build-nfs-web
+      - name: Deploy the build on the server 
+        run: rsync -avz ./build/ ${{ secrets.SSH_USER }}@${{ secrets.HOST }}:~/web/build-nfs-web
+      - name: Rename Directory build-nfs-web for versioning
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} 'mv ~/web/build-nfs-web ~/web/build-nfs-web$(date +%Y%m%d_%H%M%S)'
+  
