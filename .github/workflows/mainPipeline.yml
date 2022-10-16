@@ -53,7 +53,9 @@ jobs:
       - name: ajout Known Hosts
         run: ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
       - name: création dossier build
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} mkdir -p ./web/build
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} mkdir -p ./web/build-nfs-web
+      - name: run deploy
+        run: rsync -avz ./build/ ${{ secrets.SSH_USER }}@${{ secrets.HOST }}:~/web/build-nfs-web
       - name: renom dossier build
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} 'mv ~/web/build ~/web/build-$(date +%Y%m%d_%H%M%S)'
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} 'mv ~/web/build ~/web/build-nfs-web$(date +%Y%m%d_%H%M%S)'
   
