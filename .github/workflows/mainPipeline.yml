@@ -44,5 +44,5 @@ jobs:
       - name: Deploy the build on the server 
         run: rsync -avz ./build/ ${{ secrets.SSH_USER }}@${{ secrets.HOST }}:~/web/build-nfs-web
       - name: Rename Directory build-nfs-web for versioning
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} 'mv ~/web/build-nfs-web ~/web/build-nfs-web$(date +%Y%m%d_%H%M%S)'
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} 'mv ~/web/build-nfs-web ~/web/build-nfs-web_$(date +%Y-%m-%d:%H-%M-%S)'
   
